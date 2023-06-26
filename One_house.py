@@ -32,6 +32,7 @@ classified_state_of_building = data[0]["classified"]["building"]["condition"]
 
 """ classified_frontages = soup.find(string="Number of frontages").find_next_sibling('td').contents[0] """
 
+# Modify the values of some variables based on some conditions
 if classified_kitchen == "not installed":
     classified_kitchen = "Yes"
 elif classified_kitchen == "installed":
