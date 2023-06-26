@@ -40,6 +40,7 @@ elif classified_kitchen == "installed":
 else:
     classified_kitchen = "Unknown information"
 
+#m2 it's not ready
 if classified_terrace == "true":
     classified_terrace = "Yes, " + "m²"
 elif classified_terrace == "false":
