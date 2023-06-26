@@ -9,11 +9,11 @@ response = requests.get(url)
 # Parse the response content using BeautifulSoup
 soup = BeautifulSoup(response.content, "html.parser")
 
-# Find the HTML element that contains the JavaScript code with window.dataLayer
-# You may need to inspect the web page source code to find the right selector
+#  HTML element that contains the JavaScript code with window.dataLayer
+# need to inspect the web page source code to find the right selector
 script = soup.find("script", string=lambda t: "window.dataLayer" in t).string # Script element # Script element
-# Use the json.loads method to convert the text into a Python dictionary
-# You may need to remove some extra characters or lines from the text before parsing it
+# json.loads method to convert the text into a Python dictionary
+# remove some extra characters or lines from the text before parsing it
 data = json.loads(script.split("window.dataLayer = ")[1].strip().rstrip(";")) # Data dictionary
 
 # Access the dictionary keys and values to get the information you want
