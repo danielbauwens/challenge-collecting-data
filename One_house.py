@@ -61,7 +61,7 @@ print("Subtype of property:", classified_subtype)
 print("Price of property:", classified_price, "euro")
 print("Number of bedrooms:", classified_room)
 print("Is terrace exists:", classified_terrace)
-print("Is graden exists: Yes,", classified_garden, "m²")#we only can get m2, tommorow i will do it better
+print("Is garden exists: Yes,", classified_garden, "m²")#we only can get m2, tommorow i will do it better
 print("Surface of the land(plot of land):", classified_surface_land, "m²")
 """ print("Number of frontages:", classified_frontages) """
 print("Is swimming pool exists:", classified_swimming_pool)
