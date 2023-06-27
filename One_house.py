@@ -1,10 +1,10 @@
+import time
 from bs4 import BeautifulSoup
 import requests
 import csv
 import json
 import re
-
-val = 1
+from concurrent.futures import ThreadPoolExecutor
 
 def immo():
     links = []
@@ -13,12 +13,13 @@ def immo():
         immolist = requests.get(url)
         soup = BeautifulSoup(immolist.content, 'html.parser')
         memories = soup.find_all(class_='card__title-link')
+
     for link in memories:
         if link.find_parent('li'):
             links.append(link.get('href'))
     
-    for page in links:
-        main(page)
+    with ThreadPoolExecutor() as executor:
+        executor.map(main, links)
 
 
 def main(urlq):
@@ -148,11 +149,12 @@ def main(urlq):
     # Write the dictionary to the CSV file
     with open(filename, 'a', newline='', encoding='utf-8') as f:
         writer = csv.DictWriter(f, fieldnames=data_dict.keys())
-        if val is 1:
-            writer.writeheader()
-            val = 0
-        
+        writer.writeheader()
         writer.writerow(data_dict)
 
-immo()
+if __name__ == "__main__":
+    start_time = time.time()  # Record the start time
+    immo()
+    end_time = time.time()  # Record the end time
+    print("Execution time: ", end_time - start_time, "seconds")  # Print the execution time
 
