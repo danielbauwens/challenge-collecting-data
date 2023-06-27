@@ -4,9 +4,11 @@ import csv
 import json
 import re
 
+val = 1
+
 def immo():
     links = []
-    for i in range(3):
+    for i in range(1):
         url = f"https://www.immoweb.be/en/search/house-and-apartment/for-sale?countries=BE&page={i+1}&orderBy=relevance"
         immolist = requests.get(url)
         soup = BeautifulSoup(immolist.content, 'html.parser')
@@ -146,7 +148,10 @@ def main(urlq):
     # Write the dictionary to the CSV file
     with open(filename, 'a', newline='', encoding='utf-8') as f:
         writer = csv.DictWriter(f, fieldnames=data_dict.keys())
-        writer.writeheader()
+        if val is 1:
+            writer.writeheader()
+            val = 0
+        
         writer.writerow(data_dict)
 
 immo()
