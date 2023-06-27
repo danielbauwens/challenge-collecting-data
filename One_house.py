@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 import requests
+import csv
 import json
 
 # Send a GET request to the web page URL
@@ -67,3 +68,28 @@ print("Surface of the land(plot of land):", classified_surface_land, "m²")
 print("Is swimming pool exists:", classified_swimming_pool)
 print("ID number:", classified_id)
 print("State of the building:", classified_state_of_building)
+
+
+#using dictory to store info for csv file
+data_dict = {
+    "Fully equipped kitchen": classified_kitchen,
+    "Type of property": classified_type,
+    "Subtype of property": classified_subtype,
+    "Price of property": classified_price,
+    "Number of bedrooms": classified_room,
+    "Is terrace exists": classified_terrace,
+    "Is garden exists": "Yes, " + str(classified_garden) + " m²",
+    "Surface of the land": str(classified_surface_land) + " m²",
+    "Is swimming pool exists": classified_swimming_pool,
+    "ID number": classified_id,
+    "State of the building": classified_state_of_building
+}
+
+# Specify the name of the CSV file
+filename = "property_data.csv"
+
+# Write the dictionary to the CSV file
+with open(filename, 'w', newline='') as f:
+    writer = csv.DictWriter(f, fieldnames=data_dict.keys())
+    writer.writeheader()
+    writer.writerow(data_dict)
