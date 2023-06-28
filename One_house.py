@@ -132,8 +132,8 @@ def main(urlq):
         classified_garden_area = classified_garden
         classified_garden = 1
 
-    print("Garder:", classified_garden)
-    print("Garder area m2:", classified_garden_area)
+    print("garden:", classified_garden)
+    print("garden area m2:", classified_garden_area)
 
     print("Surface of the land(plot of land):", classified_surface_land, "m²")
     """ print("Number of frontages:", classified_frontages) """
