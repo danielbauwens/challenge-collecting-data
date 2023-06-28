@@ -7,9 +7,12 @@ import re
 from concurrent.futures import ThreadPoolExecutor
 
 def immo():
+
+    # Existing listings to compare against for duplicates
+    existing_listings = []
     links = []
 
-    for i in range(333):
+    for i in range(3):
         url = f"https://www.immoweb.be/en/search/house-and-apartment/for-sale?countries=BE&page={i+1}&orderBy=relevance"
         immolist = requests.get(url)
         soup = BeautifulSoup(immolist.content, 'html.parser')
@@ -48,6 +51,21 @@ def immo():
     with ThreadPoolExecutor(max_workers=num_workers) as executor:
         executor.map(main, links)
 
+    # Read existing listings from the CSV file
+    existing_listings = read_existing_listings(filename)
+
+    # Append new listings to the CSV file
+    with open(filename, 'a', newline='', encoding='utf-8') as f:
+        writer = csv.DictWriter(f, fieldnames=data_dict.keys())
+
+        for url in links:
+            listing_data = main(url)
+
+            # Check for duplicate listings based on ID, Zip Code, and Garden area
+            if not is_duplicate_listing(listing_data, existing_listings):
+                writer.writerow(listing_data)
+    
+
 
 def main(urlq):
 
@@ -85,7 +103,7 @@ def main(urlq):
     classified_surface_land = data[0]["classified"]["land"]["surface"]
     classified_swimming_pool = data[0]["classified"]["wellnessEquipment"]["hasSwimmingPool"]
     classified_state_of_building = data[0]["classified"]["building"]["condition"]
-    classidied_zip_code = data[0]["classified"]["zip"]
+    classified_zip_code = data[0]["classified"]["zip"]
 
     # Access the dictionary keys and values to get the information you want from second data layer
     """ classified_frontages = soup.find(string="Number of frontages").find_next_sibling('td').contents[0] """
@@ -96,7 +114,7 @@ def main(urlq):
 
     # Print the information
     print("Locality:", classified_cityname)
-    print("Zip code:", classidied_zip_code)
+    print("Zip code:", classified_zip_code)
 
     # check kitchen
     if classified_kitchen == "not installed":
@@ -154,7 +172,7 @@ def main(urlq):
     #using dictory to store info for csv file
     data_dict = {
         "Locality": classified_cityname,
-        "Zip code:": classidied_zip_code,
+        "Zip code:": classified_zip_code,
         "Kitchen": classified_kitchen,
         "Type of property": classified_type,
         "Subtype of property": classified_subtype,
@@ -178,9 +196,31 @@ def main(urlq):
         writer = csv.DictWriter(f, fieldnames=data_dict.keys())
         writer.writerow(data_dict)
 
+def read_existing_listings(filename):
+    with open(filename, 'r', newline='', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        existing_listings = list(reader)
+
+    return existing_listings
+
+def is_duplicate_listing(listing_data, existing_listings):
+    # Iterate over each existing listing in the list of existing_listings
+    for existing_listing in existing_listings:
+        # Check if the ID number of the existing listing matches the ID number of the listing_data
+        if existing_listing['ID number'] == listing_data['ID number']:
+            # If the ID numbers match, check if the Zip code of the existing listing matches the Zip code of the listing_data (*placeholder for address)
+            if existing_listing['Zip code'] == listing_data['Zip code']:
+                # If the Zip codes match, check if the Garden area of the existing listing matches the Garden area of the listing_data (*placeholder for living area)
+                if existing_listing['Garden area'] == listing_data['Garden area']:
+                    return True  # Return True if all three conditions match, indicating a duplicate listing
+                else:
+                    break
+            else:
+                break
+    return False  # Return False if no duplicate listing is found
+
 if __name__ == "__main__":
     start_time = time.time()  # Record the start time
     immo()
     end_time = time.time()  # Record the end time
     print("Execution time: ", end_time - start_time, "seconds")  # Print the execution time
-
