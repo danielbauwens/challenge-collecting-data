@@ -8,17 +8,44 @@ from concurrent.futures import ThreadPoolExecutor
 
 def immo():
     links = []
-    for i in range(1):
+
+    for i in range(333):
         url = f"https://www.immoweb.be/en/search/house-and-apartment/for-sale?countries=BE&page={i+1}&orderBy=relevance"
         immolist = requests.get(url)
         soup = BeautifulSoup(immolist.content, 'html.parser')
         memories = soup.find_all(class_='card__title-link')
 
-    for link in memories:
-        if link.find_parent('li'):
-            links.append(link.get('href'))
-    
-    with ThreadPoolExecutor() as executor:
+        for link in memories:
+            if link.find_parent('li'):
+                links.append(link.get('href'))
+
+    filename = "property_data.csv"
+    # Prepare the headers
+    data_dict = {
+        "Locality": None,
+        "Zip code": None,
+        "Kitchen": None,
+        "Type of property": None,
+        "Subtype of property": None,
+        "Price of property in euro": None,
+        "Number of bedrooms": None,
+        "Terrace": None,
+        "Garden": None,
+        "Garden area": None,
+        "Surface of the land": None,
+        "Swimming pool": None,
+        "ID number": None,
+        "State of the building": None,
+        "URL": None
+    }
+    # Write the headers to the CSV file
+    with open(filename, 'w', newline='', encoding='utf-8') as f:
+        writer = csv.DictWriter(f, fieldnames=data_dict.keys())
+        writer.writeheader()
+
+    num_workers = 16 #cores your CPU has
+    #However the code is primarily I/O-bound, not CPU-bound
+    with ThreadPoolExecutor(max_workers=num_workers) as executor:
         executor.map(main, links)
 
 
@@ -149,7 +176,6 @@ def main(urlq):
     # Write the dictionary to the CSV file
     with open(filename, 'a', newline='', encoding='utf-8') as f:
         writer = csv.DictWriter(f, fieldnames=data_dict.keys())
-        writer.writeheader()
         writer.writerow(data_dict)
 
 if __name__ == "__main__":
