@@ -9,8 +9,8 @@ from concurrent.futures import ThreadPoolExecutor
 def immo():
     links = []
 
-    for i in range(333):
-        url = f"https://www.immoweb.be/en/search/house-and-apartment/for-sale?countries=BE&page={i+1}&orderBy=relevance"
+    for i in range(3):
+        url = f"https://www.immoweb.be/en/search/house/for-sale?countries=BE&page={i+1}&orderBy=relevance"
         immolist = requests.get(url)
         soup = BeautifulSoup(immolist.content, 'html.parser')
         memories = soup.find_all(class_='card__title-link')
@@ -18,6 +18,19 @@ def immo():
         for link in memories:
             if link.find_parent('li'):
                 links.append(link.get('href'))
+
+                
+        url2 = f"https://www.immoweb.be/en/search/apartment/for-sale?countries=BE&page={i+1}&orderBy=relevance"
+        immolist2 = requests.get(url2)
+        soup2 = BeautifulSoup(immolist2.content, 'html.parser')
+        memors = soup2.find_all(class_='card__title-link')
+        
+        for link2 in memors:
+            if link2.find_parent('li'):
+                links.append(link2.get('href'))
+
+    
+               
 
     filename = "property_data.csv"
     # Prepare the headers
@@ -29,6 +42,7 @@ def immo():
         "Subtype of property": None,
         "Price of property in euro": None,
         "Number of bedrooms": None,
+        "Living area": None,
         "Terrace": None,
         "Garden": None,
         "Garden area": None,
@@ -42,7 +56,11 @@ def immo():
     with open(filename, 'w', newline='', encoding='utf-8') as f:
         writer = csv.DictWriter(f, fieldnames=data_dict.keys())
         writer.writeheader()
-
+    
+    """ for elments in links:
+        main(elments)
+     """
+    
     num_workers = 16 #cores your CPU has
     #However the code is primarily I/O-bound, not CPU-bound
     with ThreadPoolExecutor(max_workers=num_workers) as executor:
@@ -55,13 +73,6 @@ def main(urlq):
 
     # Parse the response content using BeautifulSoup
     soup = BeautifulSoup(response.content, "html.parser")
-    #it's better to add name of the city from a dara list which Bo found (in process) but now we need to use regex
-    classified_cityname = soup.find("title")
-    classified_cityname = re.sub(r'.*?for', "", str(classified_cityname))
-    classified_cityname = re.sub('</title>', "", str(classified_cityname))
-    classified_cityname = re.sub('sale in ', "", str(classified_cityname))
-    classified_cityname = re.sub('rent in ', "", str(classified_cityname))
-    classified_cityname = re.sub(' - Immoweb', "", str(classified_cityname))
 
     # HTML element that contains the JavaScript code with window.dataLayer
     # need to inspect the web page source code to find the right selector
@@ -89,13 +100,32 @@ def main(urlq):
 
     # Access the dictionary keys and values to get the information you want from second data layer
     """ classified_frontages = soup.find(string="Number of frontages").find_next_sibling('td').contents[0] """
+    
+    #extrating data from secods data dictionary
+    scripts = soup.find_all('script')
+
+    data_class = None
+    for script in scripts:
+        if 'window.classified' in script.text:  # The variable containing the JSON data
+            clas_sting = re.search('window.classified = ({.*?});', script.text).group(1)
+            data_class = json.loads(clas_sting)
+            break
+    
+    #example:
+    #province = data_clas["customers"][0]["location"]["province"]
+    #district = data_clas["customers"][0]["location"]["district"]
+    classified_cityname = data_class['property']['location']['locality']
+    classified_living_area = data_class['property']["netHabitableSurface"]
+
+
+    
 
     #check number of rums
     if classified_room == "":
         classified_room = None
 
     # Print the information
-    print("Locality:", classified_cityname)
+    #print("Locality:", classified_cityname)
     print("Zip code:", classidied_zip_code)
 
     # check kitchen
@@ -139,8 +169,10 @@ def main(urlq):
     """ print("Number of frontages:", classified_frontages) """
 
     #check swimming pool data
-    if classified_swimming_pool == "Yes" or "True".casefold():
+    if classified_swimming_pool == "true":
         classified_swimming_pool = 1
+    elif classified_swimming_pool == "":
+        classified_swimming_pool = None
     else:
         classified_swimming_pool = 0
 
@@ -149,6 +181,7 @@ def main(urlq):
 
     print("ID number:", classified_id)
     print("State of the building:", classified_state_of_building)
+    print("Url:", urlq)
 
 
     #using dictory to store info for csv file
@@ -160,6 +193,7 @@ def main(urlq):
         "Subtype of property": classified_subtype,
         "Price of property in euro": classified_price,
         "Number of bedrooms": classified_room,
+        "Living area": classified_living_area,
         "Terrace": classified_terrace,
         "Garden": classified_garden,
         "Garden area": classified_garden_area,
