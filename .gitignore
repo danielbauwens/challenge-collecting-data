@@ -164,3 +164,9 @@ cython_debug/
 
 # Daniel's environment
 /.challenge-data-environment
+
+#Bram's environment
+/.webscrapers
+
+#assignment readme
+/1.immo_eliza_scraping.md
