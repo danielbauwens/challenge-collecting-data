@@ -5,48 +5,52 @@ import csv
 import json
 import re
 from concurrent.futures import ThreadPoolExecutor
+import uuid
 
-def immo():
+def immo(pages):
     links = []
 
-    for i in range(3):
+    for i in range(pages):
         url = f"https://www.immoweb.be/en/search/house/for-sale?countries=BE&page={i+1}&orderBy=relevance"
         immolist = requests.get(url)
         soup = BeautifulSoup(immolist.content, 'html.parser')
         memories = soup.find_all(class_='card__title-link')
-
+        
         for link in memories:
-            if link.find_parent('li'):
+            if link.find_parent('h3'):
+                continue
+            else:
                 links.append(link.get('href'))
 
-                
         url2 = f"https://www.immoweb.be/en/search/apartment/for-sale?countries=BE&page={i+1}&orderBy=relevance"
         immolist2 = requests.get(url2)
         soup2 = BeautifulSoup(immolist2.content, 'html.parser')
         memors = soup2.find_all(class_='card__title-link')
-        
-        for link2 in memors:
-            if link2.find_parent('li'):
-                links.append(link2.get('href'))
 
-    
-               
+        for link2 in memors:
+            if link2.find_parent('h3'):
+                continue
+            else:
+                links.append(link2.get('href'))
 
     filename = "property_data.csv"
     # Prepare the headers
     data_dict = {
+        "Raw num:": None,
         "Locality": None,
         "Zip code": None,
         "Kitchen": None,
         "Type of property": None,
         "Subtype of property": None,
         "Price of property in euro": None,
+        "Type of Sale": None,
         "Number of bedrooms": None,
         "Living area": None,
         "Terrace": None,
         "Garden": None,
         "Garden area": None,
-        "Surface of the land": None,
+        "Surface of the land(or plot of land)": None,
+        "Number of facades": None,
         "Swimming pool": None,
         "ID number": None,
         "State of the building": None,
@@ -57,10 +61,7 @@ def immo():
         writer = csv.DictWriter(f, fieldnames=data_dict.keys())
         writer.writeheader()
     
-    """ for elments in links:
-        main(elments)
-     """
-    
+
     num_workers = 16 #cores your CPU has
     #However the code is primarily I/O-bound, not CPU-bound
     with ThreadPoolExecutor(max_workers=num_workers) as executor:
@@ -68,7 +69,6 @@ def immo():
 
 
 def main(urlq):
-
     response = requests.get(urlq)
 
     # Parse the response content using BeautifulSoup
@@ -116,9 +116,17 @@ def main(urlq):
     #district = data_clas["customers"][0]["location"]["district"]
     classified_cityname = data_class['property']['location']['locality']
     classified_living_area = data_class['property']["netHabitableSurface"]
+    classified_number_of_facades = data_class['property']['building']['facadeCount']
 
+    #classified types of sales
+    flags = data_class['flags']
+    sales_types = ['isPublicSale', 'isNotarySale', 'isLifeAnnuitySale', 'isInvestmentProject', 'isSoldOrRented', "isAnInteractiveSale","isUnderOption"]
+    classified_sales_type = None
 
-    
+    for sales_type in sales_types:
+        if sales_type in flags and flags[sales_type]:
+            classified_sales_type = sales_type
+            break
 
     #check number of rums
     if classified_room == "":
@@ -186,18 +194,21 @@ def main(urlq):
 
     #using dictory to store info for csv file
     data_dict = {
+        "Raw num:": None,
         "Locality": classified_cityname,
         "Zip code:": classidied_zip_code,
         "Kitchen": classified_kitchen,
         "Type of property": classified_type,
         "Subtype of property": classified_subtype,
         "Price of property in euro": classified_price,
+        "Type of Sale": classified_sales_type,
         "Number of bedrooms": classified_room,
         "Living area": classified_living_area,
         "Terrace": classified_terrace,
         "Garden": classified_garden,
         "Garden area": classified_garden_area,
-        "Surface of the land": (classified_surface_land),
+        "Surface of the land(or plot of land)": classified_surface_land,
+        "Number of facades": classified_number_of_facades,
         "Swimming pool": classified_swimming_pool,
         "ID number": classified_id,
         "State of the building": classified_state_of_building,
@@ -214,7 +225,9 @@ def main(urlq):
 
 if __name__ == "__main__":
     start_time = time.time()  # Record the start time
-    immo()
+    pages = 1
+    print("Starting scaping...")
+    immo(pages)
     end_time = time.time()  # Record the end time
     print("Execution time: ", end_time - start_time, "seconds")  # Print the execution time
 
