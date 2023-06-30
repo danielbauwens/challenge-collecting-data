@@ -173,14 +173,94 @@ def main(urlq):
     # Specify the name of the CSV file
     filename = "property_data.csv"
 
+<<<<<<< Updated upstream
     # Write the dictionary to the CSV file
     with open(filename, 'a', newline='', encoding='utf-8') as f:
         writer = csv.DictWriter(f, fieldnames=data_dict.keys())
         writer.writerow(data_dict)
 
 if __name__ == "__main__":
+=======
+    # Read existing listings from the CSV file
+    existing_listings = read_existing_listings(filename)
+
+    # Append new listings to the CSV file
+    # Check for duplicate listings based on ID, Zip Code, and Garden area
+    if not is_duplicate_listing(data_dict, existing_listings):
+        # Open the file in append mode to add the new listing
+        with open(filename, 'a', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=data_dict.keys())
+            writer.writerow(data_dict)
+
+
+def main():
+    # Record the start time of the script
+    start_time = time.time()
+
+    # Create a session object
+    session = requests.Session()
+
+    # Set the number of pages to scrape. In this case, it is set to 1, but you can adjust this number based on your needs.
+    pages = 10
+
+    # Initialize the CSV file with the right headers. This ensures we have a file ready to hold the data we're going to scrape.
+    initialize_csv()
+
+    # Get all the property links from the defined number of pages. This function will return a list of URLs.
+    links = get_links(session, pages)
+
+    print("Starting scraping...")
+
+    # Process the links in a multithreaded manner to speed up the process.
+    # The number of workers is set to 16, but this can be adjusted based on your system's capabilities.
+    num_workers = 16
+    with ThreadPoolExecutor(max_workers=num_workers) as executor:
+        # Use a lambda function to pass the session object to process_link function
+        executor.map(lambda url: process_link(session, url), links)
+
+    # Record the end time of the script
+    end_time = time.time()
+
+    print("Scraping done!")
+    # Calculate and print the total time taken for the script to execute
+    print("Execution time: ", end_time - start_time, "seconds")  
+
+
+def read_existing_listings(filename):
+    with open(filename, 'r', newline='', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        existing_listings = list(reader)
+
+    return existing_listings
+
+def is_duplicate_listing(data_dict, existing_listings):
+        global duplicate_counter
+        # Iterate over each existing listing in the list of existing_listings
+        for existing_listing in existing_listings:
+            # Check if the ID number of the existing listing matches the ID number of the data_dict
+            if existing_listing is not None and data_dict is not None:
+                if existing_listing['ID number'] == data_dict['ID number']:
+                    # If the ID numbers match, check if the Zip code of the existing listing matches the Zip code of the data_dict (*placeholder for address)
+                    if existing_listing['Zip code'] == data_dict['Zip code']:
+                        # If the Zip codes match, check if the Garden area of the existing listing matches the Garden area of the data_dict (*placeholder for living area)
+                        if existing_listing['Garden area'] == data_dict['Garden area']:
+                            duplicate_counter += 1
+                            return True  # Return True if all three conditions match, indicating a duplicate listing
+                        else:
+                            break
+                    else:
+                        break
+                else:
+                    break
+        return False  # Return False if no duplicate listing is found
+
+if __name__ == "__main__":
+
+    #Creating counter for duplicates
+    duplicate_counter = 0
+>>>>>>> Stashed changes
     start_time = time.time()  # Record the start time
-    immo()
+    main()
     end_time = time.time()  # Record the end time
     print("Execution time: ", end_time - start_time, "seconds")  # Print the execution time
 
