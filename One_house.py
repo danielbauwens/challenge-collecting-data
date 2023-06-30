@@ -265,6 +265,7 @@ def write_to_csv(data_dict):
     """This function writes a dictionary to the CSV file."""
     filename = "property_data.csv"
 
+
     # Read existing listings from the CSV file
     existing_listings = read_existing_listings(filename)
 
@@ -342,9 +343,5 @@ if __name__ == "__main__":
 
     #Creating counter for duplicates
     duplicate_counter = 0
-
-    start_time = time.time()  # Record the start time
-    immo()
-    end_time = time.time()  # Record the end time
+    main()
     print("Number of duplicate listings:", duplicate_counter)
-    print("Execution time: ", end_time - start_time, "seconds")  # Print the execution time
