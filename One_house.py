@@ -248,7 +248,7 @@ def extract_relevant_data(soup, url):
         "Number of bedrooms": classified_room,
         "Living area": classified_living_area,
         "Terrace": classified_terrace,
-        #"Terrace area": classified_terrace_area,
+        #"Terrace area": classified_terrace_area, its not working. at least now
         "Garden": classified_garden,
         "Garden area": classified_garden_area,
         "Surface of the land(or plot of land)": classified_surface_land,
@@ -262,48 +262,76 @@ def extract_relevant_data(soup, url):
 
 
 def write_to_csv(data_dict):
-    """This function writes a dictionary to the CSV file."""
+    """
+    This function writes a dictionary of property data to a CSV file.
+    
+    Args:
+    data_dict (dict): A dictionary where the keys are the column names and the 
+    values are the corresponding data values for a property listing.
+    """
+
+    # Specify the name of the CSV file to which data will be written.
     filename = "property_data.csv"
 
+    # Open the specified file in append mode ('a'). This means that data will be added 
+    # to the end of the file, instead of overwriting the existing content. 
+    # 'newline='' ensures that the writer doesn't add any extra newlines between rows, 
+    # and 'encoding='utf-8' ensures that the data is written in UTF-8 encoding.
     with open(filename, 'a', newline='', encoding='utf-8') as f:
+
+        # Create a DictWriter object. This object lets us write dictionaries to a CSV file. 
+        # The fieldnames parameter is a list of keys in the dictionary. The writer will 
+        # write these keys as the column headers in the CSV file.
         writer = csv.DictWriter(f, fieldnames=data_dict.keys())
+
+        # Write the dictionary as a row in the CSV file.
         writer.writerow(data_dict)
 
 
+
 def main():
-    # Record the start time of the script
+    """
+    Main function to run the scraping script. It initializes the necessary setup,
+    scrapes the data from the target site, and finally prints the execution time.
+    """
+
+    # Record the start time of the script. This is used to calculate total execution time.
     start_time = time.time()
 
-    # Create a session object
+    # Create a Session object. A Session object will persist certain parameters across requests.
+    # For example, if you log into a website, the Session object will keep you logged in for the duration of that session.
     session = requests.Session()
 
-    # Set the number of pages to scrape. In this case, it is set to 1, but you can adjust this number based on your needs.
+    # Set the number of pages to scrape. This can be modified according to the requirements.
     pages = 5
 
-    # Initialize the CSV file with the right headers. This ensures we have a file ready to hold the data we're going to scrape.
+    # Call the function to initialize the CSV file. It creates the CSV file and writes the column headers.
     initialize_csv()
 
-    # Get all the property links from the defined number of pages. This function will return a list of URLs.
+    # Call the function to get all the property links from the defined number of pages.
+    # This function returns a list of URLs, each corresponding to a specific property listing.
     links = get_links(session, pages)
 
     print("Starting scraping...")
 
-    # Process the links in a multithreaded manner to speed up the process.
-    # The number of workers is set to 16, but this can be adjusted based on your system's capabilities.
+    # Use ThreadPoolExecutor to run multiple threads in parallel. This significantly improves performance when dealing with a large number of links.
+    # Here, we specify a max of 16 workers (i.e., 16 threads running in parallel). This value can be adjusted based on the capabilities of the system.
     num_workers = 16
     with ThreadPoolExecutor(max_workers=num_workers) as executor:
-        # Use a lambda function to pass the session object to process_link function
+        # For each link in the links list, we use the map function to apply the process_link function.
+        # We use a lambda function to pass the session object to the process_link function for each URL.
         executor.map(lambda url: process_link(session, url), links)
 
-    # Record the end time of the script
+    # Record the end time of the script after all the scraping is done.
     end_time = time.time()
 
     print("Scraping done!")
-    # Calculate and print the total time taken for the script to execute
+
+    # Calculate the total execution time by subtracting the start_time from the end_time.
+    # Print this value to see how long the entire script took to run.
     print("Execution time: ", end_time - start_time, "seconds")  
 
-
 if __name__ == "__main__":
-    # Ensures the script is being run directly and not being imported as a module. If the script is being run directly, the main function is called.
+    # This condition ensures that the main function is only run when the script is executed directly (not imported as a module).
+    # If this script is being imported from another script, the calling script can choose when to call the main function.
     main()
-
