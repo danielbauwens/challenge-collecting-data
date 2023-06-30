@@ -9,10 +9,9 @@ from concurrent.futures import ThreadPoolExecutor
 def immo():
 
     # Existing listings to compare against for duplicates
-    existing_listings = []
     links = []
 
-    for i in range(3):
+    for i in range(20):
         url = f"https://www.immoweb.be/en/search/house-and-apartment/for-sale?countries=BE&page={i+1}&orderBy=relevance"
         immolist = requests.get(url)
         soup = BeautifulSoup(immolist.content, 'html.parser')
@@ -46,29 +45,14 @@ def immo():
         writer = csv.DictWriter(f, fieldnames=data_dict.keys())
         writer.writeheader()
 
-    num_workers = 16 #cores your CPU has
+    num_workers = 12 #cores your CPU has
     #However the code is primarily I/O-bound, not CPU-bound
     with ThreadPoolExecutor(max_workers=num_workers) as executor:
         executor.map(main, links)
 
-    # Read existing listings from the CSV file
-    existing_listings = read_existing_listings(filename)
-
-    # Append new listings to the CSV file
-    with open(filename, 'a', newline='', encoding='utf-8') as f:
-        writer = csv.DictWriter(f, fieldnames=data_dict.keys())
-
-        for url in links:
-            listing_data = main(url)
-
-            # Check for duplicate listings based on ID, Zip Code, and Garden area
-            if not is_duplicate_listing(listing_data, existing_listings):
-                writer.writerow(listing_data)
-    
-
-
 def main(urlq):
 
+    existing_listings = []
     response = requests.get(urlq)
 
     # Parse the response content using BeautifulSoup
@@ -191,10 +175,16 @@ def main(urlq):
     # Specify the name of the CSV file
     filename = "property_data.csv"
 
-    # Write the dictionary to the CSV file
-    with open(filename, 'a', newline='', encoding='utf-8') as f:
-        writer = csv.DictWriter(f, fieldnames=data_dict.keys())
-        writer.writerow(data_dict)
+    # Read existing listings from the CSV file
+    existing_listings = read_existing_listings(filename)
+
+    # Append new listings to the CSV file
+    # Check for duplicate listings based on ID, Zip Code, and Garden area
+    if not is_duplicate_listing(data_dict, existing_listings):
+        # Open the file in append mode to add the new listing
+        with open(filename, 'a', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=data_dict.keys())
+            writer.writerow(data_dict)
 
 def read_existing_listings(filename):
     with open(filename, 'r', newline='', encoding='utf-8') as f:
@@ -203,24 +193,34 @@ def read_existing_listings(filename):
 
     return existing_listings
 
-def is_duplicate_listing(listing_data, existing_listings):
-    # Iterate over each existing listing in the list of existing_listings
-    for existing_listing in existing_listings:
-        # Check if the ID number of the existing listing matches the ID number of the listing_data
-        if existing_listing['ID number'] == listing_data['ID number']:
-            # If the ID numbers match, check if the Zip code of the existing listing matches the Zip code of the listing_data (*placeholder for address)
-            if existing_listing['Zip code'] == listing_data['Zip code']:
-                # If the Zip codes match, check if the Garden area of the existing listing matches the Garden area of the listing_data (*placeholder for living area)
-                if existing_listing['Garden area'] == listing_data['Garden area']:
-                    return True  # Return True if all three conditions match, indicating a duplicate listing
+def is_duplicate_listing(data_dict, existing_listings):
+        global duplicate_counter
+        # Iterate over each existing listing in the list of existing_listings
+        for existing_listing in existing_listings:
+            # Check if the ID number of the existing listing matches the ID number of the data_dict
+            if existing_listing is not None and data_dict is not None:
+                if existing_listing['ID number'] == data_dict['ID number']:
+                    # If the ID numbers match, check if the Zip code of the existing listing matches the Zip code of the data_dict (*placeholder for address)
+                    if existing_listing['Zip code'] == data_dict['Zip code']:
+                        # If the Zip codes match, check if the Garden area of the existing listing matches the Garden area of the data_dict (*placeholder for living area)
+                        if existing_listing['Garden area'] == data_dict['Garden area']:
+                            duplicate_counter += 1
+                            return True  # Return True if all three conditions match, indicating a duplicate listing
+                        else:
+                            break
+                    else:
+                        break
                 else:
                     break
-            else:
-                break
-    return False  # Return False if no duplicate listing is found
+        return False  # Return False if no duplicate listing is found
 
 if __name__ == "__main__":
+
+    #Creating counter for duplicates
+    duplicate_counter = 0
+
     start_time = time.time()  # Record the start time
     immo()
     end_time = time.time()  # Record the end time
+    print("Number of duplicate listings:", duplicate_counter)
     print("Execution time: ", end_time - start_time, "seconds")  # Print the execution time
