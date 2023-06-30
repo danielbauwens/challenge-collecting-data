@@ -156,10 +156,10 @@ def extract_relevant_data(soup, url):
 
     # Retrieve the necessary details from the data layer.
     classified_url = url
-    classified_id = data[0]["classified"]["id"]  # Classified id
-    classified_type = data[0]["classified"]["type"]  # Classified type
-    classified_subtype = data[0]["classified"]["subtype"]  # Classified subtype
-    classified_price = data[0]["classified"]["price"]  # Classified price
+    classified_id = data[0]["classified"]["id"]  
+    classified_type = data[0]["classified"]["type"]
+    classified_subtype = data[0]["classified"]["subtype"]  
+    classified_price = data[0]["classified"]["price"] 
     classified_kitchen = data[0]["classified"]["kitchen"]["type"]
     classified_room = data[0]["classified"]["bedroom"]["count"]
     classified_terrace = data[0]["classified"]["outdoor"]["terrace"]["exists"]
