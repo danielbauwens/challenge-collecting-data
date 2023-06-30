@@ -131,6 +131,8 @@ venv.bak/
 #Oleksandr's env
 collecting-data-environment/
 
+#Bram's env
+webscrapers/
 # Spyder project settings
 .spyderproject
 .spyproject
