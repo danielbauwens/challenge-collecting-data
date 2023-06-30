@@ -285,7 +285,7 @@ def main():
     session = requests.Session()
 
     # Set the number of pages to scrape. In this case, it is set to 1, but you can adjust this number based on your needs.
-    pages = 5
+    pages = 10
 
     # Initialize the CSV file with the right headers. This ensures we have a file ready to hold the data we're going to scrape.
     initialize_csv()
@@ -322,13 +322,14 @@ def is_duplicate_listing(data_dict, existing_listings):
         # Iterate over each existing listing in the list of existing_listings
         for existing_listing in existing_listings:
             # Check if the ID number of the existing listing matches the ID number of the data_dict
-            if existing_listing is not None and data_dict is not None:
+              if existing_listing is not None and data_dict is not None:
                 if existing_listing['ID number'] == data_dict['ID number']:
                     # If the ID numbers match, check if the Zip code of the existing listing matches the Zip code of the data_dict (*placeholder for address)
                     if existing_listing['Zip code'] == data_dict['Zip code']:
                         # If the Zip codes match, check if the Garden area of the existing listing matches the Garden area of the data_dict (*placeholder for living area)
                         if existing_listing['Garden area'] == data_dict['Garden area']:
                             duplicate_counter += 1
+                            print(duplicate_counter)
                             return True  # Return True if all three conditions match, indicating a duplicate listing
                         else:
                             break
@@ -341,10 +342,6 @@ def is_duplicate_listing(data_dict, existing_listings):
 if __name__ == "__main__":
 
     #Creating counter for duplicates
-    duplicate_counter = 0
-
-    start_time = time.time()  # Record the start time
-    immo()
-    end_time = time.time()  # Record the end time
+    duplicate_counter = 7
+    main()
     print("Number of duplicate listings:", duplicate_counter)
-    print("Execution time: ", end_time - start_time, "seconds")  # Print the execution time
