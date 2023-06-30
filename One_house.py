@@ -265,6 +265,7 @@ def write_to_csv(data_dict):
     """This function writes a dictionary to the CSV file."""
     filename = "property_data.csv"
 
+
     # Read existing listings from the CSV file
     existing_listings = read_existing_listings(filename)
 
@@ -342,6 +343,6 @@ def is_duplicate_listing(data_dict, existing_listings):
 if __name__ == "__main__":
 
     #Creating counter for duplicates
-    duplicate_counter = 7
+    duplicate_counter = 0
     main()
     print("Number of duplicate listings:", duplicate_counter)

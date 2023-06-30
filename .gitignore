@@ -131,6 +131,8 @@ venv.bak/
 #Oleksandr's env
 collecting-data-environment/
 
+#Bram's env
+webscrapers/
 # Spyder project settings
 .spyderproject
 .spyproject
@@ -164,6 +166,7 @@ cython_debug/
 
 # Daniel's environment
 /.challenge-data-environment
+
 
 #Bram's environment
 /.webscrapers
