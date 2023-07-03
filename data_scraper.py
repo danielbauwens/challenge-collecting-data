@@ -75,7 +75,7 @@ def initialize_csv():
         "Number of bedrooms",
         "Living area",
         "Terrace",
-        #"Terrace area",
+        "Terrace area",
         "Garden",
         "Garden area",
         "Surface of the land(or plot of land)",
@@ -185,7 +185,7 @@ def extract_relevant_data(soup, url):
     classified_cityname = data_class['property']['location']['locality']
     classified_living_area = data_class['property']["netHabitableSurface"]
     classified_number_of_facades = data_class['property']['building']['facadeCount']
-    # classified_terrace_area = ["property"]["terraceSurface"] #need to find right key
+    classified_terrace_area = data_class["property"]["terraceSurface"] #need to find right key
 
     # Identify the type of sale based on which sales type flags are set to true.
     flags = data_class['flags']
@@ -249,7 +249,7 @@ def extract_relevant_data(soup, url):
         "Number of bedrooms": classified_room,
         "Living area": classified_living_area,
         "Terrace": classified_terrace,
-        #"Terrace area": classified_terrace_area,
+        "Terrace area": classified_terrace_area,
         "Garden": classified_garden,
         "Garden area": classified_garden_area,
         "Surface of the land(or plot of land)": classified_surface_land,
