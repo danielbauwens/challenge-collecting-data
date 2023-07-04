@@ -49,7 +49,7 @@ This is the first out of a four part study project to make a working data model 
 ## Credits
 Credits for this project goes to:    
 
- Oleksandr Tsepukh: https://www.linkedin.com/in/oleksandr-tsepukh-ba4985279?   - Main Developer    
-Bram Michielsen: https://www.linkedin.com/in/brammichielsen?   - Repository Manager      
-Daniel Bauwens: https://www.linkedin.com/in/daniel-bauwens-5515a8256/?   - Project Lead    
+ Oleksandr Tsepukh: [GitHub](https://www.linkedin.com/in/oleksandr-tsepukh-ba4985279?)   - Main Developer    
+Bram Michielsen: [GitHub](https://www.linkedin.com/in/brammichielsen?)   - Repository Manager      
+Daniel Bauwens: [GitHub](https://www.linkedin.com/in/daniel-bauwens-5515a8256/?)   - Project Lead    
 
