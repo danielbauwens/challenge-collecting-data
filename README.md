@@ -1,8 +1,26 @@
 # challenge-collecting-data
-by Oleksandr, Bram and Daniel
 
 
 ![dataset](./assets/csvfile.png)
+
+## About
+This is the first out of a four part study project to make a working data model that analyses the current Belgian housing market, and is able to predict House- and Apartment pricing accurately. Our dataset uses +10.000 listings.  
+
+1. 'main()': Central operating module for our scraper. Calls necessary functions.
+2. 'initialize_csv()': This function initializes a CSV file with the specified(read code) headers.
+3. 'get_links()': This function retrieves the links for the property listings.
+4. 'process_link()': This function processes a single property link. The steps involved in processing the link are:
+    1. Fetching the page content using an HTTP GET request.
+    2. Parsing the page content using BeautifulSoup.
+    3. 'extract_relevant_data()': This function extracts the relevant data from the HTML content of a property listing page. 
+    It uses the BeautifulSoup instance of the HTML content (`soup`) and the URL of the page (`url`) as inputs.
+    After identifying and extracting the relevant data from the HTML content, the function packages the 
+    data into a dictionary and returns it.
+    4. 'write_to_csv()': This function writes the scraped data to the CSV file.
+       1. Calls 'read_existing_listings()': Which reads the current state of the CSV file.
+       2. 'is_duplicate_listing()': Is supposed to check for duplicate listings in the CSV file before appending new listing, but it is currently not functioning as intended.
+
+
 
 
 ## Installation and Requirements
@@ -29,27 +47,22 @@ Day 5: Bram continues work on duplication checking code, discussing with Coach a
 
 
 ![dataset](./assets/flowchart_group5.PNG)
-
-
-## About
-This is the first out of a four part study project to make a working data model that analyses the current Belgian housing market, and is able to predict House- and Apartment pricing accurately. Our dataset uses +10.000 listings.     
+   
 
 ## Potential Improvements
 
-- More Data     
-- Selenium function to extract missing area values    
-- Fix duplicate checking code     
+- More scraped data       
+- Fix broken duplicate checking code (use pandas instead)     
 - Better interface (G)UI     
 - Async requests for faster data extraction     
-- Expand property data   
-- Safety check if user exceeds max value input  
-- ...    
+- Expand property data parameters  
+- Safety check if user exceeds max value input
+     
 
-
-## Credits
+## Team
 Credits for this project goes to:    
 
- Oleksandr Tsepukh: [GitHub](https://www.linkedin.com/in/oleksandr-tsepukh-ba4985279?)   - Main Developer    
-Bram Michielsen: [GitHub](https://www.linkedin.com/in/brammichielsen?)   - Repository Manager      
-Daniel Bauwens: [GitHub](https://www.linkedin.com/in/daniel-bauwens-5515a8256/?)   - Project Lead    
+- Main Developer: [Oleksandr Tsepukh's LinkedIn](https://www.linkedin.com/in/oleksandr-tsepukh-ba4985279?)       
+- Repository Manager: [Bram Michielsen's LinkedIn](https://www.linkedin.com/in/brammichielsen?)         
+- Project Lead: [Daniel Bauwens's LinkedIn](https://www.linkedin.com/in/daniel-bauwens-5515a8256/?)       
 
