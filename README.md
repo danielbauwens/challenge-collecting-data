@@ -28,9 +28,9 @@ Using Python 3.11 and 'pip install -m requirements.txt' to get all required pack
 
 
 ## Usage
-To run the code, simply open your command prompt(cmd), powershell or vscode terminal window and type "python main.py" or use the path to both the python.exe and the main.py file. That would look something like this:    
+To run the code, simply open your command prompt(cmd), powershell or vscode terminal window and type "python data_scraper.py" or use the path to both the python.exe and the main.py file. That would look something like this:    
 
-'c:/Users/Daniel/Documents/GitHub/Challenge-Data/.challenge_data_env/Scripts/python.exe c:/Users/Daniel/Documents/GitHub/Challenge-Data/main.py'   
+'c:/Users/Daniel/Documents/GitHub/Challenge-Data/.challenge_data_env/Scripts/python.exe c:/Users/Daniel/Documents/GitHub/Challenge-Data/data_scraper.py'   
    
 To correctly run the data-collection program, you need to specify a number between 1 - 333(333 is the maximum value the website we use to scrape from can handle for page numbers). This will provide slightly less than 20.000 scraped listings.
 
